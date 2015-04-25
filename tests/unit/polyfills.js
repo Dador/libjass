@@ -18,27 +18,8 @@
  * limitations under the License.
  */
 
-define(["intern!tdd", "intern/chai!assert", "lib/libjass"], function (tdd, assert, libjass) {
-	tdd.suite("SimpleSet", function () {
-		var originalSet = null;
-
-		tdd.before(function () {
-			assert.isFunction(libjass.Set, "libjass.Set is not a function.");
-
-			originalSet = libjass.Set;
-
-			if (typeof Set !== "undefined") {
-				assert.equal(originalSet, Set, "libjass.Set did not default to the runtime's implementation.");
-			}
-
-			libjass.Set = null;
-			assert.isNotNull(libjass.Set, "libjass.Set actually got set to null instead of SimpleSet.");
-
-			if (typeof Set !== "undefined") {
-				assert.notEqual(libjass.Set, originalSet, "libjass.Set is still the runtime's implementation of Set.");
-			}
-		});
-
+define(["intern!tdd", "intern/chai!assert", "lib/libjass", "intern"], function (tdd, assert, libjass, intern) {
+	tdd.suite("Set", function () {
 		tdd.test("Basic", function () {
 			var set = new libjass.Set();
 
@@ -107,33 +88,9 @@ define(["intern!tdd", "intern/chai!assert", "lib/libjass"], function (tdd, asser
 				throw new Error("forEach callback called for empty set.");
 			});
 		});
-
-		tdd.after(function () {
-			libjass.Set = originalSet;
-			assert.equal(libjass.Set, originalSet, "libjass.Set did not get reset to the original value.");
-		});
 	});
 
-	tdd.suite("SimpleMap", function () {
-		var originalMap = null;
-
-		tdd.before(function () {
-			assert.isFunction(libjass.Map, "libjass.Map is not a function.");
-
-			originalMap = libjass.Map;
-
-			if (typeof Map !== "undefined") {
-				assert.equal(originalMap, Map, "libjass.Map did not default to the runtime's implementation.");
-			}
-
-			libjass.Map = null;
-			assert.isNotNull(libjass.Map, "libjass.Map actually got set to null instead of SimpleMap.");
-
-			if (typeof Map !== "undefined") {
-				assert.notEqual(libjass.Map, originalMap, "libjass.Map is still the runtime's implementation of Map.");
-			}
-		});
-
+	tdd.suite("Map", function () {
 		tdd.test("Basic", function () {
 			var map = new libjass.Map();
 
@@ -212,33 +169,9 @@ define(["intern!tdd", "intern/chai!assert", "lib/libjass"], function (tdd, asser
 				throw new Error("forEach callback called for empty map.");
 			});
 		});
-
-		tdd.after(function () {
-			libjass.Map = originalMap;
-			assert.equal(libjass.Map, originalMap, "libjass.Map did not get reset to the original value.");
-		});
 	});
 
-	tdd.suite("SimplePromise", function () {
-		var originalPromise = null;
-
-		tdd.before(function () {
-			assert.isFunction(libjass.Promise, "libjass.Promise is not a function.");
-
-			originalPromise = libjass.Promise;
-
-			if (typeof Promise !== "undefined") {
-				assert.equal(originalPromise, Promise, "libjass.Promise did not default to the runtime's implementation.");
-			}
-
-			libjass.Promise = null;
-			assert.isNotNull(libjass.Promise, "libjass.Promise actually got set to null instead of SimplePromise.");
-
-			if (typeof Promise !== "undefined") {
-				assert.notEqual(libjass.Promise, originalPromise, "libjass.Promise is still the runtime's implementation of Promise.");
-			}
-		});
-
+	tdd.suite("Promise", function () {
 		tdd.test("Basic", function () {
 			var deferred = this.async(1000);
 
@@ -251,11 +184,6 @@ define(["intern!tdd", "intern/chai!assert", "lib/libjass"], function (tdd, asser
 			}).then(deferred.resolve.bind(deferred), deferred.reject.bind(deferred));
 
 			return deferred.promise;
-		});
-
-		tdd.after(function () {
-			libjass.Promise = originalPromise;
-			assert.equal(libjass.Promise, originalPromise, "libjass.Promise did not get reset to the original value.");
 		});
 	});
 });
