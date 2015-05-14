@@ -176,6 +176,7 @@
         var parts = require(7);
         var settings_1 = require(22);
         var map_1 = require(29);
+        var rules = new map_1.Map();
         /**
          * Parses a given string with the specified rule.
          *
@@ -1445,12 +1446,7 @@
              */
             ParserRun.prototype.parse_decimalOrHexInt32 = function (parent) {
                 var current = new ParseNode(parent);
-                var valueNode = null;
-                if (this.read(current, "&H") !== null || this.read(current, "&h") !== null) {
-                    valueNode = this.parse_hexInt32(current);
-                } else {
-                    valueNode = this.parse_decimalInt32(current);
-                }
+                var valueNode = this.read(current, "&H") !== null || this.read(current, "&h") !== null ? this.parse_hexInt32(current) : this.parse_decimalInt32(current);
                 if (valueNode === null) {
                     parent.pop();
                     return null;
@@ -1484,8 +1480,7 @@
                 var current = new ParseNode(parent);
                 var characteristicNode = new ParseNode(current, "");
                 var mantissaNode = null;
-                var next;
-                for (next = this._peek(); this._haveMore() && next >= "0" && next <= "9"; next = this._peek()) {
+                for (var next = this._peek(); this._haveMore() && next >= "0" && next <= "9"; next = this._peek()) {
                     characteristicNode.value += next;
                 }
                 if (characteristicNode.value.length === 0) {
@@ -1494,7 +1489,7 @@
                 }
                 if (this.read(current, ".") !== null) {
                     mantissaNode = new ParseNode(current, "");
-                    for (next = this._peek(); this._haveMore() && next >= "0" && next <= "9"; next = this._peek()) {
+                    for (var next = this._peek(); this._haveMore() && next >= "0" && next <= "9"; next = this._peek()) {
                         mantissaNode.value += next;
                     }
                     if (mantissaNode.value.length === 0) {
@@ -1727,7 +1722,6 @@
         makeTagParserFunction("3c", parts.OutlineColor, ParserRun.prototype.parse_color, false);
         makeTagParserFunction("4a", parts.ShadowAlpha, ParserRun.prototype.parse_alpha, false);
         makeTagParserFunction("4c", parts.ShadowColor, ParserRun.prototype.parse_color, false);
-        var rules = new map_1.Map();
         for (var _i = 0, _a = Object.keys(ParserRun.prototype); _i < _a.length; _i++) {
             var key = _a[_i];
             if (key.indexOf("parse_") === 0 && typeof ParserRun.prototype[key] === "function") {
@@ -1962,9 +1956,9 @@
 
                       case "V4+ Styles":
                         if (this._ass.stylesFormatSpecifier === null) {
-                            var property = misc_1.parseLineIntoProperty(line);
-                            if (property !== null && property.name === "Format") {
-                                this._ass.stylesFormatSpecifier = property.value.split(",").map(function (str) {
+                            var property_1 = misc_1.parseLineIntoProperty(line);
+                            if (property_1 !== null && property_1.name === "Format") {
+                                this._ass.stylesFormatSpecifier = property_1.value.split(",").map(function (str) {
                                     return str.trim();
                                 });
                             } else {}
@@ -1975,9 +1969,9 @@
 
                       case "Events":
                         if (this._ass.dialoguesFormatSpecifier === null) {
-                            var property = misc_1.parseLineIntoProperty(line);
-                            if (property !== null && property.name === "Format") {
-                                this._ass.dialoguesFormatSpecifier = property.value.split(",").map(function (str) {
+                            var property_2 = misc_1.parseLineIntoProperty(line);
+                            if (property_2 !== null && property_2.name === "Format") {
+                                this._ass.dialoguesFormatSpecifier = property_2.value.split(",").map(function (str) {
                                     return str.trim();
                                 });
                             } else {}
@@ -5233,11 +5227,10 @@
                         return RendererSettings._stripQuotes(url.match(/^url\((.+)\)$/)[1]);
                     });
                     if (urls.length > 0) {
-                        var name = RendererSettings._stripQuotes(rule.style.getPropertyValue("font-family"));
-                        var existingList = fontMap.get(name);
+                        var name_1 = RendererSettings._stripQuotes(rule.style.getPropertyValue("font-family"));
+                        var existingList = fontMap.get(name_1);
                         if (existingList === undefined) {
-                            existingList = [];
-                            fontMap.set(name, existingList);
+                            fontMap.set(name_1, existingList = []);
                         }
                         existingList.unshift.apply(existingList, urls);
                     }
@@ -5371,10 +5364,7 @@
         exports.AnimationCollection = AnimationCollection;
     }, /* 17 ./renderers/web/dom-parser */ function (exports) {
         /** @type {!DomParser} */
-        exports.domParser = null;
-        if (typeof DOMParser !== "undefined") {
-            exports.domParser = new DOMParser();
-        }
+        exports.domParser = typeof DOMParser !== "undefined" ? new DOMParser() : null;
     }, /* 18 ./renderers/web/drawing-styles */ function (exports, require) {
         var dom_parser_1 = require(17);
         var parts = require(7);
@@ -6076,12 +6066,7 @@
                 } else if (this._bold !== false) {
                     fontStyleOrWeight += this._bold + " ";
                 }
-                var fontSize;
-                if (isTextOnlySpan) {
-                    fontSize = (this._scaleY * SpanStyles._getFontSize(this._fontName, this._fontSize * this._fontScaleY, this._fontSizeElement)).toFixed(3);
-                } else {
-                    fontSize = (this._scaleY * SpanStyles._getFontSize(this._fontName, this._fontSize, this._fontSizeElement)).toFixed(3);
-                }
+                var fontSize = (this._scaleY * SpanStyles._getFontSize(this._fontName, this._fontSize * (isTextOnlySpan ? this._fontScaleY : 1), this._fontSizeElement)).toFixed(3);
                 var lineHeight = (this._scaleY * this._fontSize).toFixed(3);
                 span.style.font = "" + fontStyleOrWeight + fontSize + "px/" + lineHeight + 'px "' + this._fontName + '"';
                 var textDecoration = "";
@@ -6134,8 +6119,8 @@
                 var outlineHeight = this._scaleY * this._outlineHeight;
                 var outlineFilter = "";
                 var blurFilter = "";
+                var filterId = "svg-filter-" + this._id + "-" + this._nextFilterId++;
                 if (this._settings.enableSvg) {
-                    var filterId = "svg-filter-" + this._id + "-" + this._nextFilterId++;
                     if (outlineWidth > 0 || outlineHeight > 0) {
                         /* Construct an elliptical border by merging together many rectangles. The border is creating using dilate morphology filters, but these only support
                          * generating rectangles.   http://lists.w3.org/Archives/Public/public-fx/2012OctDec/0003.html
@@ -6146,7 +6131,8 @@
                         (function (addOutline) {
                             if (outlineWidth <= outlineHeight) {
                                 if (outlineWidth > 0) {
-                                    for (var x = 0; x <= outlineWidth; x += increment) {
+                                    var x;
+                                    for (x = 0; x <= outlineWidth; x += increment) {
                                         addOutline(x, outlineHeight / outlineWidth * Math.sqrt(outlineWidth * outlineWidth - x * x));
                                     }
                                     if (x !== outlineWidth + increment) {
@@ -6157,7 +6143,8 @@
                                 }
                             } else {
                                 if (outlineHeight > 0) {
-                                    for (var y = 0; y <= outlineHeight; y += increment) {
+                                    var y;
+                                    for (y = 0; y <= outlineHeight; y += increment) {
                                         addOutline(outlineWidth / outlineHeight * Math.sqrt(outlineHeight * outlineHeight - y * y), y);
                                     }
                                     if (y !== outlineHeight + increment) {
@@ -7794,6 +7781,10 @@
          * Promise implementation for browsers that don't support it.
          *
          * @param {function(function(T), function(*))} resolver
+         *
+         * @constructor
+         * @template T
+         * @private
          */
         var SimplePromise = function () {
             function SimplePromise(resolver) {
@@ -8067,8 +8058,7 @@
                     var currentlyPending = false;
                     var div = document.createElement("div");
                     var observer = new MutationObserver(function () {
-                        var processing = pending;
-                        pending = [];
+                        var processing = pending.splice(0, pending.length);
                         for (var _i = 0; _i < processing.length; _i++) {
                             var callback = processing[_i];
                             callback();
@@ -8450,6 +8440,7 @@
          * @memberOf libjass.webworker
          */
         exports.supported = typeof Worker !== "undefined";
+        var _scriptNode = typeof document !== "undefined" && document.currentScript !== undefined ? document.currentScript : null;
         /**
          * Create a new web worker and returns a {@link libjass.webworker.WorkerChannel} to it.
          *
@@ -8466,10 +8457,6 @@
             return new channel_1.WorkerChannelImpl(new Worker(scriptPath));
         }
         exports.createWorker = createWorker;
-        var _scriptNode = null;
-        if (typeof document !== "undefined" && document.currentScript !== undefined) {
-            _scriptNode = document.currentScript;
-        }
         if (typeof WorkerGlobalScope !== "undefined" && global instanceof WorkerGlobalScope) {
             // This is a web worker. Set up a channel to talk back to the main thread.
             new channel_1.WorkerChannelImpl(global);
