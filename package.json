@@ -32,7 +32,7 @@
 		"pngjs": "0.4.0",
 		"sax": "1.x",
 		"typescript": "https://github.com/Arnavion/typescript-github/tarball/2015-05-23-711886e09994eda5bafa9383d92954242fc342c5",
-		"uglify-js": "2.x >=2.4.16"
+		"uglify-js": "https://github.com/Arnavion/UglifyJS2/tarball/4f7cca1c685306992918847021c40664f2a951f6"
 	},
 	"private": true
 }

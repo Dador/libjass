@@ -81,7 +81,7 @@ var Run = (function () {
 
 		this._modules = Object.create(null);
 
-		this._rootSourceMap = UjsSourceMap({ file: this._outputLibraryName + ".js", root: "" });
+		this._rootSourceMap = UglifyJS.SourceMap({ file: this._outputLibraryName + ".js", root: "" });
 	}
 
 	Run.prototype.addFile = function (file) {
@@ -510,58 +510,6 @@ module.exports = {
 		});
 	}
 };
-
-var SourceMap = require.cache[require.resolve("uglify-js")].require("source-map");
-
-function UjsSourceMap(options) {
-	var orig_maps = Object.create(null);
-
-	var generator = new SourceMap.SourceMapGenerator({
-		file: options.file,
-		sourceRoot: options.root,
-	});
-
-	return {
-		addInput: function (rawSourceMap) {
-			var consumer = new SourceMap.SourceMapConsumer(rawSourceMap);
-			orig_maps[consumer.file] = consumer;
-		},
-		add: function (source, gen_line, gen_col, orig_line, orig_col, name) {
-			var originalMap;
-			if (source) {
-				originalMap = orig_maps[source];
-			}
-			else {
-				source = "?";
-			}
-
-			if (originalMap) {
-				var info = originalMap.originalPositionFor({
-					line: orig_line,
-					column: orig_col
-				});
-
-				if (info.source === null) {
-					return;
-				}
-
-				source = info.source;
-				orig_line = info.line;
-				orig_col = info.column;
-				name = info.name || name;
-			}
-
-			generator.addMapping({
-				generated : { line: gen_line, column: gen_col },
-				original  : { line: orig_line, column: orig_col },
-				source    : source,
-				name      : name
-			});
-		},
-		get: function () { return generator; },
-		toString: function () { return generator.toString(); },
-	};
-}
 
 var originalSymbolUnreferenced = UglifyJS.AST_Symbol.prototype.unreferenced;
 
