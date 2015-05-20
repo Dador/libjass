@@ -16,24 +16,23 @@
 	},
 	"main": "lib/libjass.js",
 	"scripts": {
-		"prepublish": "gulp clean default",
-		"build-gulplib": "tsc ./gulplib/typescript/index.ts ./gulplib/doc.ts ./gulplib/typings.d.ts ./node_modules/typescript/bin/typescript.d.ts -m commonjs -t es5 -noImplicitAny",
-		"test": "gulp test",
+		"prepublish": "node ./build.js clean default",
+		"build": "tsc ./build/typescript/index.ts ./build/doc.ts ./build/typings.d.ts ./node_modules/typescript/bin/typescript.d.ts -m commonjs -t es5 -noImplicitAny",
+		"test": "node ./build.js test",
 		"test-lib": "intern-client config=tests/intern reporters=pretty",
 		"test-minified": "intern-client config=tests/intern reporters=pretty minified=true",
 		"test-browser": "intern-runner config=tests/intern",
 		"test-doc": "intern-client config=tests/intern-doc reporters=pretty"
 	},
 	"devDependencies": {
+		"async": "0.9.x",
 		"firefox-profile": "0.3.x",
-		"gulp": "3.x",
 		"intern": "2.x",
 		"npm": "2.x",
 		"pngjs": "0.4.0",
 		"sax": "1.x",
 		"typescript": "https://github.com/Arnavion/typescript-github/tarball/2015-05-23-711886e09994eda5bafa9383d92954242fc342c5",
-		"uglify-js": "2.x >=2.4.16",
-		"vinyl": "latest"
+		"uglify-js": "2.x >=2.4.16"
 	},
 	"private": true
 }

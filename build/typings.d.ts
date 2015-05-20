@@ -29,16 +29,24 @@ declare var Buffer: {
 	concat(list: Buffer[]): Buffer;
 };
 
+declare var process: {
+	cwd(): string;
+};
+
 declare var require: {
     resolve(id: string): string;
 };
 
 declare module "fs" {
-	export function lstatSync(path: string): Stats;
+	export function mkdir(path: string, callback: (err: { code: string }) => void): void;
 	export function readdirSync(path: string): string[];
+	export function readFile(filename: string, options: { encoding: string }, callback: (err: any, data: string) => void): void;
 	export function readFileSync(filename: string, options: { encoding: string }): string;
+	export function stat(path: string, callback: (err: any, stats: Stats) => void): void;
+	export function statSync(path: string): Stats;
 	export function unwatchFile(filename: string, listener?: (curr: Stats, prev: Stats) => void): void;
 	export function watchFile(filename: string, options: { interval?: number }, listener: (curr: Stats, prev: Stats) => void): void;
+	export function writeFile(filename: string, data: any, options: { encoding: string }, callback: (err: any) => void): void;
 
 	interface Stats {
 		isDirectory(): boolean;
@@ -57,28 +65,19 @@ declare module "path" {
 }
 
 declare module "stream" {
-	export class Transform<T> {
-		constructor(opts?: { objectMode?: boolean; });
+	export class Readable<T> {
+		constructor(opts: { objectMode: boolean; });
 
-		_transform(chunk: T, encoding: string, callback: (error?: Error) => void): void;
+		_read(): void;
+		emit(event: string, ...args: any[]): boolean;
+		push(chunk: T): boolean;
+	}
+
+	export class Transform<TIn, TOut> {
+		constructor(opts: { objectMode?: boolean; });
+
+		_transform(chunk: TIn, encoding: string, callback: (error?: Error) => void): void;
 		_flush(callback: (error?: Error) => void): void;
-		push(chunk: T, encoding?: string): boolean;
+		push(chunk: TOut): boolean;
 	}
-}
-
-
-// Type definitions for vinyl 0.4.3
-// Project: https://github.com/wearefractal/vinyl
-// Definitions by: vvakame <https://github.com/vvakame/>, jedmao <https://github.com/jedmao>
-// Definitions: https://github.com/borisyankov/DefinitelyTyped
-
-declare module "vinyl" {
-	class File {
-		constructor(options?: { path: string; contents: Buffer; base?: string; });
-
-		path: string;
-		contents: Buffer;
-	}
-
-	export = File;
 }

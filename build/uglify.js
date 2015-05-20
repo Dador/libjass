@@ -22,9 +22,8 @@ var fs = require("fs");
 var path = require("path");
 
 var UglifyJS = require("uglify-js");
-var Vinyl = require("vinyl");
 
-var makeTransform = require("./helpers.js").makeTransform;
+var FileTransform = require("./helpers.js").FileTransform;
 
 var Run = (function () {
 	function Run(entry, outputLibraryName, unusedVarsToIgnore) {
@@ -311,15 +310,15 @@ var Run = (function () {
 		var stream = UglifyJS.OutputStream(output);
 		this._root.print(stream);
 
-		outputStream.push(new Vinyl({
+		outputStream.push({
 			path: _this._outputLibraryName + ".js",
 			contents: Buffer.concat([new Buffer(stream.toString()), new Buffer("\n//# sourceMappingURL=" + _this._outputLibraryName + ".js.map")])
-		}));
+		});
 
-		outputStream.push(new Vinyl({
+		outputStream.push({
 			path: _this._outputLibraryName + ".js.map",
 			contents: new Buffer(_this._rootSourceMap.get().toString())
-		}));
+		});
 
 		// Print unused variables
 		if (haveUnusedVars) {
@@ -337,10 +336,10 @@ var Run = (function () {
 })();
 
 module.exports = {
-	gulp: function (entry, outputLibraryName, unusedVarsToIgnore) {
+	build: function (entry, outputLibraryName, unusedVarsToIgnore) {
 		var run = new Run(entry, outputLibraryName, unusedVarsToIgnore);
 
-		return makeTransform(function (file) {
+		return new FileTransform(function (file) {
 			run.addFile(file);
 		}, function () {
 			run.build(this);
@@ -350,7 +349,7 @@ module.exports = {
 	watch: function (entry, outputLibraryName, unusedVarsToIgnore) {
 		var files = Object.create(null);
 
-		return makeTransform(function (file) {
+		return new FileTransform(function (file) {
 			if (file.path !== "END") {
 				files[file.path] = file;
 			}
@@ -368,7 +367,7 @@ module.exports = {
 		var codeFile = null;
 		var sourceMapFile = null;
 
-		return makeTransform(function (file) {
+		return new FileTransform(function (file) {
 			switch (path.extname(file.path)) {
 				case ".js":
 					codeFile = file;
@@ -493,7 +492,7 @@ module.exports = {
 				codeFile.path = codeFile.path.replace(/\.js$/, ".min.js");
 				sourceMapFile.path = sourceMapFile.path.replace(/\.js\.map$/, ".min.js.map");
 
-				codeFile.contents = Buffer.concat([new Buffer(stream.toString()), new Buffer("\n//# sourceMappingURL="), new Buffer(sourceMapFile.relative)]);
+				codeFile.contents = Buffer.concat([new Buffer(stream.toString()), new Buffer("\n//# sourceMappingURL="), new Buffer(sourceMapFile.path)]);
 				this.push(codeFile);
 
 				var inputSourceMapObject = JSON.parse(sourceMapFile.contents.toString());
